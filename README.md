@@ -15,3 +15,8 @@
 - plugin是在 ( `Compiler` ) 类的 ( `constructor` ) 中处理的
 - loader是在 ( `new Compiler().run` ) 方法中的 ( `buildModules()` ) 方法中的 ( `getSource()` ) 方法中处理的
 
+### (3) 自定义命令
+- `cnpm run build`: 使用 webpack 打包
+- `cnpm run 7-pack`: 使用自己的 Compiler 打包
+- 具体看 `package.json` 中的配置 
+
