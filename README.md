@@ -34,7 +34,7 @@
   - 1.具体就是遍历plugins数组，执行每个plugin中的apply方法
   - 2.在 apply 方法中，调用比如 compilerInstance.hooks.afterPlugin.tap() 进行钩子监听注册
       - **生命周期钩子注册**: `在plugin中进行tap()注册`, `tap()被调用是在Compiler的constructor()中，最先执行`
-      - **生命周期钩子调用**: `在Compiler类不同的实例方法中call()调用`
+      - **生命周期钩子调用**: `在Compiler类不同的实例方法中通过call()调用`
 
 ### (5) loader
 - loader的处理时机
