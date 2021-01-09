@@ -2,6 +2,10 @@
 - 新建 7-compiler 文件夹
 - yarn init -y 或者 npm init -y 来初始化项目
 
+### 资料
+- [[手写webpack-Compiler] - 我的掘金文章](https://juejin.cn/post/6844903973002936327)
+- [[webapck基础] - 我的掘金文章](https://juejin.cn/post/6844904070201753608#heading-0)
+
 ### (1) 相关依赖
 - yarn add @babel/parser @babel/traverse @babel/types @babel/generator
 - yarn add ejs
