@@ -31,8 +31,8 @@
   - **apply方法的参数**: 是 const compilerInstance = new Compiler() 生成的实例对象
   - **compilerInstance**: 具有hooks属性，hooks对象中具有不同的生命周期钩子函数，比如 hooks.afterPlugin
 - plugin是在Compiler类的构造函数中进行处理的
-  - 1. 具体就是遍历plugins数组，执行每个plugin中的apply方法
-  - 2. 在 apply 方法中，调用比如 compilerInstance.hooks.afterPlugin.tap() 进行钩子监听注册
+  - 1.具体就是遍历plugins数组，执行每个plugin中的apply方法
+  - 2.在 apply 方法中，调用比如 compilerInstance.hooks.afterPlugin.tap() 进行钩子监听注册
       - **生命周期钩子注册**: `在plugin中进行tap()注册`, `注册方法tap被调用的时机是在Compiler的constructor()中，因为最先执行`
       - **生命周期钩子调用**: `在Compiler类不同的实例方法中call()调用`
 
