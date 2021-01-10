@@ -6,6 +6,12 @@
 - [[手写webpack-Compiler] - 我的掘金文章](https://juejin.cn/post/6844903973002936327)
 - [[webapck基础] - 我的掘金文章](https://juejin.cn/post/6844904070201753608#heading-0)
 
+### 说明
+- `webpack.config.7compiler.js` 是传入 `7-compiler.js` 用于手写 `Compiler` 的配置文件
+- `webpack.config.js` 是用来学习webpack基础的配置文件
+- `cnpm run 7-pack`: 使用自己的 Compiler 打包
+- `cnpm run build`: 使用 webpack 打包
+
 ### (1) 相关依赖
 - yarn add @babel/parser @babel/traverse @babel/types @babel/generator
 - yarn add ejs
@@ -42,3 +48,31 @@
   - `getSource(moduleAbsolute)` 中通过 `fs.readFileSync()` 获取源码字符串后处理 `loader`
 - loader的加载顺序
   - 从右往左，上下往上
+
+
+---
+---
+# (二) webpack 基础学习
+
+### 一些单词
+```
+template: 模板
+compilation: 编译 // compiler
+basic useage: 基本用法
+relate: 联系，讲述
+```
+
+### (1) 启动开发服务器express，并直接在浏览器中显示打包后的网页
+- **webpack-dev-server**
+  - npm install -D webpack-dev-server
+  - 只在开发环境中需要，即development环境
+  - 可以指定需要启动静态服务的文件夹，并通过命令 webpack-dev-server 来启动静态服务
+  - 可以直接配置到 package.json 的 scripts 命令中去
+- **html-webpack-plugin**
+  - 安装: npm install -D html-webpack-plugin 
+  - 作用: 指定模板html，并将该html打包到output.path指定的文件夹中，并自动引入打包后的js等资源文件
+  - 可以指定template,filename,hash等
+```
+
+```
+

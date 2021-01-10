@@ -10,6 +10,7 @@
 
 # production
 /build
+/dist
 
 # dist
 # 这里提交dist文件夹的目的是方便调试

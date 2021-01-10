@@ -8,7 +8,7 @@ const ejs = require("ejs");
 const { SyncHook } = require("tapable");
 
 // config 是webpack配置文件，返回的是一个对象，即 module.exports 返回的那个对象
-const config = require(path.resolve(__dirname, "webpack.config.js"));
+const config = require(path.resolve(__dirname, "webpack.config.7compiler.js"));
 
 class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts中，直接执行命令 "cnpm run 7-pack"
   constructor(config) {
