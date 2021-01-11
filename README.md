@@ -3,8 +3,8 @@
 - yarn init -y 或者 npm init -y 来初始化项目
 
 ### 资料
-- [[手写webpack-Compiler] - 我的掘金文章](https://juejin.cn/post/6844903973002936327)
-- [[webapck基础] - 我的掘金文章](https://juejin.cn/post/6844904070201753608#heading-0)
+- [手写webpack-Compiler - 我的掘金文章](https://juejin.cn/post/6844903973002936327)
+- [webapck基础 - 我的掘金文章](https://juejin.cn/post/6844904070201753608#heading-0)
 
 ### 说明
 - `webpack.config.7compiler.js` 是传入 `7-compiler.js` 用于手写 `Compiler` 的配置文件
@@ -60,6 +60,14 @@ template: 模板
 compilation: 编译 // compiler
 basic useage: 基本用法
 relate: 联系，讲述
+appropriage: 适当的
+extract: 抽离，提取 // mini-css-extract-plugin
+parallel: 平行，并行
+minilizer: 最小化
+optimization: 最佳的
+proposal: 提议，建议 // @babel/plugin-proposal-decorators
+decorators: 装饰工
+uglify: 丑陋的 // uglifyjs-webpack-plugin压缩js为一行，丑
 ```
 
 ### (1) 启动开发服务器express，并直接在浏览器中显示打包后的网页
@@ -67,12 +75,58 @@ relate: 联系，讲述
   - npm install -D webpack-dev-server
   - 只在开发环境中需要，即development环境
   - 可以指定需要启动静态服务的文件夹，并通过命令 webpack-dev-server 来启动静态服务
-  - 可以直接配置到 package.json 的 scripts 命令中去
+  - 可以直接配置到 package.json 的 scripts 命令中去，比如： scripts: { "dev": "webpack-dev-server"}
 - **html-webpack-plugin**
   - 安装: npm install -D html-webpack-plugin 
   - 作用: 指定模板html，并将该html打包到output.path指定的文件夹中，并自动引入打包后的js等资源文件
   - 可以指定template,filename,hash等
-```
 
-```
+### (2) css相关
+- **style-loader**
+- **css-loader**
+- **sass-loader**
+- **sass**
+- **node-sass 或者 dart-sass, webpack官方建议使用dart-sass**
+- **mini-css-extract-plugin**
+- **postcss-loader**
+- **autoprefixer** 需要在package.json的browserslist中添加一些浏览器信息
+- **optimize-css-assets-webpack-plugin**
+- 安装
+  - `npm install style-loader css-loader sass-loader sass node-sass -D` sass css
+  - `npm install mini-css-extract-plugin -D` 单独抽离，自动引入
+  - `npm install postcss-loader autoprefixer` 添加浏览器的前缀，可单独配置postcss.config.js
 
+### (3) 压缩 css 和 js
+- **optimize-css-assets-webpack-plugin** 压缩css
+- **uglifyjs-webpack-plugin** 压缩js
+- 压缩打包后的 css 和 js，这样css和js文件都只有一行，并且函数名等都会得到优化
+- 安装
+  - `npm install optimize-css-assets-webpack-plugin uglifyjs-webpack-plugin -D`
+
+### (4) js相关
+- babel-loader
+- @babel/core // 核心
+- @babel/preset-env
+- @babel/plugin-proposal-decorators // 装饰器语法; proposal是提议，建议的意思
+- @babel/plugin-proposal-class-properties // class语法
+- @babel/plugin-transform-runtime
+- @babel/runtime // 注意是该依赖是 dependencies 而不是 devDependencies
+- @babel/polyfill // 直接在入口js文件中引入
+- babel的配置
+  - 可以新建 `.babelrc` 文件单独配置
+  - 可以在webpack的loader配置的 `babel-loader` 的 `options` 中配置
+- @babel/plugin-proposal-decorators 和 @babel/plugin-proposal-class-properties的顺序
+  - @babel/plugin-proposal-decorators --------------在前
+  - @babel/plugin-proposal-class-properties---------在后
+- `npm install babel-loader @babel/core @babel/preset-env -D`
+- `npm install @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators -D`
+- `npm install @babel/plugin-transform-runtime -D`
+- `npm install @babel/runtime -S` 注意是-S
+- `npm install @babel/polyfill -S` 注意是-S
+
+### (5) 图片处理相关
+- file-loader
+- url-loader // 小于阈值会转成base64，大于阈值会使用file-loader
+- html-withimg-loder
+- `npm install file-loader url-loader html-withimg-loader -D`
+- [url-loader官网说明](https://webpack.docschina.org/loaders/url-loader/#root)
