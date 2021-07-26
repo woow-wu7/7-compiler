@@ -13,7 +13,7 @@ const config = require(path.resolve(__dirname, "webpack.config.7compiler.js"));
 class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts中，直接执行命令 "cnpm run 7-pack"
   constructor(config) {
     this.config = config;
-    this.entryId = null; // 保存入口文件的路径 './scr/index.js'
+    this.entryId = null; // 保存入口文件的路径 './scr/index.js'，即 ( webpack.config.js ) 中的 ( entry ) 入口文件的相对路径
     this.modules = {}; // 保存所有模块依赖 key="./src/xxx.js"  value="该模块的源码字符串"
     this.entry = config.entry; // 入口文件的 ( 相对路径 )
     this.root = process.cwd(); // node.js进程的当前工作路径
@@ -29,12 +29,14 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
     let plugins = this.config.plugins // 获取webpack.config.js配置文件中的 plugins 数组，( webpack.config.js是默认名，可以手动在输入命令行时指定 )
     if (Array.isArray(plugins)) {
       plugins.forEach(plugin => {
-        plugin.apply(this) 
+        plugin.apply(this)
         // 1. this是compiler实例对象
         // 2. 每个 webpack plugin 都必须具有一个 apply 方法，( apply(compiler)方法接受compiler实例对象作为参数 )
+        // 3. this.config.plugins 即是webpack.config.js中的plugins = [new HtmlWebpackPlugin(), ...] = [插件实例1, 插件实例2, ...] 
+        // 4. 通过插件实例就能调用原型链上的 apply 方法
       })
     }
-    this.hooks.afterPlugins.call() 
+    this.hooks.afterPlugins.call() // ======================== afterPlugins
     // 钩子函数的调用call(): 在执行完所有 plugin 时，触发对应的钩子函数 afterPlugins
     // 钩子函数的注册tap(): 在 plugin 的 apply 方法中通过tap方法注册，而tap方法被调用是在constructor中被调用，因为constructor会最新被执行，即最先完成监听钩子的注册
   }
@@ -76,14 +78,19 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
     return contentString;
   };
 
-  
+
   // parse()
   // -------------------------------------------------------------------------------parse
-  // 参数：(1)sourse: 源码字符串 (2)parentPath: 父路径
+  // 参数：(1)source: 源码字符串 (2)parentPath: 父路径
   // 返回值: (1)解析过后的源码字符串 (2)依赖数组列表
   // (二) 解析
   parse = (source, parentPath) => {
     // ( 源码string ) => ( AST ) => ( 遍历AST ) => ( 转换AST ) => ( 获取新的源码字符串 )
+    // 1. @babel/parser -------------- 将源码string转成AST
+    // 2. @babel/traverse ----------- 遍历AST，并在遍历过程中通过 @babel/types完成修改，添加，删除等操作
+    // 3. @babel/types -------------- 修改，添加，删除AST的各个节点
+    // 4. @babel/generator ---------- 将修改后的AST再转成源码字符串
+
     const dependencies = []; // 依赖数组
 
     // AST
@@ -94,18 +101,18 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
       CallExpression(p) {
         const node = p.node;
         if (node.callee.name === "require") {
-          node.callee.name = "__webpack_require__"; // ( require <=> __webpack_require__ )
+          node.callee.name = "__webpack_require__"; // ( require <=> __webpack_require__ )，即将 require 修改成 __webpack_require__
           let modulePath = node.arguments[0].value;
           modulePath =
             "./" +
             path.join(parentPath, modulePath).replace(/\\/g, "/") +
             (path.extname(modulePath) ? "" : ".js"); // 后缀存在就加空字符串即不做操作，不存在加.js
-          
+
           // push
           dependencies.push(modulePath);
 
           // 转换
-          node.arguments = [babelTypes.stringLiteral(modulePath)]; // 把AST中的argumtns中的Literal修改掉 => 修改成最新的modulePath
+          node.arguments = [babelTypes.stringLiteral(modulePath)]; // 把AST中的arguments中的Literal修改掉 => 修改成最新的modulePath
         }
       },
     });
@@ -122,8 +129,10 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
   // -------------------------------------------------------------------------------buildModules
   // 参数 (1)moduleAbsolutePath: 模块的 ( 绝对路径 ) (2)isEntry: 是否是入口文件
   buildModules = (moduleAbsolutePath, isEntry) => {
-    // 获取 ( 模块 )的 ( 源码字符串 )
     const source = this.getSource(moduleAbsolutePath); // --------------------------getSource
+    // source
+    // 1. 获取 ( 模块 )的 ( 源码字符串 )
+    // 2. 注意：返回的源码字符串是经过 ( loader ) 处理过后返回的 ( 源码字符串 )
 
     const moduleRelativePath = `./${path
       .relative(this.root, moduleAbsolutePath)
@@ -131,28 +140,39 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
     const parentPath = path.dirname(moduleRelativePath); // 父路径 ( './src/index.js' => './src' )
 
     if (isEntry) {
-      // 是入口文件，单独保存入口文件的路径
+      // 是入口文件，单独保存入口文件的 ( 相对路径 )
       this.entryId = moduleRelativePath;
     }
 
     const { sourceCode, dependencies } = this.parse(source, parentPath); // --------parse
+    // parse
+    // 1. 参数
+    // - source：经过 ( loader ) 处理过后返回的 ( 源码字符串 )
+    // - parentPath： 父路径
+    // 2. 返回值
+    // - sourceCode：经过 ( 源码string ) => ( AST ) => ( 遍历AST ) => ( 转换AST ) => ( 获取新的源码字符串 ) 后返回的 ( 源码字符串 )
+    // - dependencies：( 该模块 ) 依赖的 ( 其他模块 ) 的相对路径，即import，require引入模块的相对路径
+
     // console.log("1111", sourceCode, dependencies);
+
     this.modules[moduleRelativePath] = sourceCode;
+    // this.modules
+    // key：moduleRelativePath
+    // value: sourceCode
 
     // 如果该模块的依赖数组不为空，即该模块存在依赖，那么 ( 递归调用buildModules ) 方法
     if (dependencies.length) {
       dependencies.forEach(
         (dep) => this.buildModules(path.join(this.root, dep)),
         false
-      ); 
+      );
     }
   };
 
 
-  // emitFile 
-  // 通过 fs.wirteFileSync() 将源码字符串转成源码最终写入 dist 文件夹
+  // emitFile
+  // 通过 fs.writeFileSync() 将源码字符串转成源码最终写入 dist 文件夹
   //-------------------------------------------------------------------------------emitFile
-  // 将
   emitFile = () => {
     // 用 modules 对象渲染我们的模板
     // 输出到哪些目录下
@@ -176,22 +196,23 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
 
   // -------------------------------------------------------------------------------run
   run() {
-    this.hooks.run.call()
+    this.hooks.run.call() // ================================= run
     const entryAbsolutePath = path.resolve(this.root, this.entry); // 入口文件绝对路径， F:\workSpace\7-compiler\src\index.js
 
-    this.hooks.compile.call() // compile钩子
+    this.hooks.compile.call() // ============================= compile
     this.buildModules(entryAbsolutePath, true); // 创建模块的依赖关系 ----------------one
-    this.hooks.afterCompile.call() // afterCompile钩子
+    this.hooks.afterCompile.call() // ======================== afterCompile
 
     console.log("this.modules :>> ", this.modules);
     console.log("this.entryId :>> ", this.entryId);
 
     this.emitFile(); // 发射文件，即打包后的文件 --------------------------------------two
-    this.hooks.emit.call()
-    this.hooks.done.call()
+    this.hooks.emit.call() // ================================ emit
+    this.hooks.done.call() // ================================ done
   }
 }
 
 const compiler = new Compiler(config);
-compiler.hooks.entryOption.call(); // 在该时间点调用 entryOption 生命周期钩子
+compiler.hooks.entryOption.call(); // ======================== entryOption 在该时间点调用 entryOption 生命周期钩子
+// 生命周期钩子的先后顺序是: entryOption, afterPlugins, run, compile, afterCompile, emit, done
 compiler.run(); // 调用 compiler 实例上的 run 方法
