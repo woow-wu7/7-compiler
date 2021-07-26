@@ -19,7 +19,7 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
     this.root = process.cwd(); // node.js进程的当前工作路径
     this.hooks = { // 不同生命周期钩子
       entryOption: new SyncHook(), // 获取到 options 配置对象时触发
-      afterPlugins: new SyncHook(), // 解析完 plugins 后触发
+      afterPlugins: new SyncHook(), // 解析完 plugins 后触发，其实是调用apply完成插件注册后触发
       run: new SyncHook(), // 调用 run 方法时触发
       compile: new SyncHook(), // compile时触发
       afterCompile: new SyncHook(), // compile完成时触发
