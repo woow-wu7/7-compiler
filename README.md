@@ -5,7 +5,7 @@
 ### 资料
 - [手写webpack-Compiler - 我的掘金文章](https://juejin.cn/post/6844903973002936327)
 - [webapck基础 - 我的掘金文章](https://juejin.cn/post/6844904070201753608#heading-0)
-
+- [思维导读](https://github.com/woow-wu7/7-compiler/tree/main/src/images/Compiler.png)
 ### 说明
 - `webpack.config.7compiler.js` 是传入 `7-compiler.js` 用于手写 `Compiler` 的配置文件
 - `webpack.config.js` 是用来学习webpack基础的配置文件

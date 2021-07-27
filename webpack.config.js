@@ -176,7 +176,7 @@ module.exports = {
         use: [
           {
             loader: 'babel-loader', // options已在 .babelrc 文件中单独配置
-            // options: {
+            // options: { // ------------- use数组中如果是对象的方式，则可以配置 ( options配置对象 ) 和 ( loader ) 等
             //   presets: [
             //     ['@babel/preset-env'],
             //   ],
