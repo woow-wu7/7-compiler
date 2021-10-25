@@ -29,3 +29,6 @@ useJsGeneratorImg()
 
 const index = 10;
 console.log(index);
+
+console.log(`AUTH`, AUTH); // 测试 webpack.DefinePlugin
+console.log('hello') // 测试 replaceLoader，将 hello -> hi

@@ -1,18 +1,16 @@
-const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCssAssetsWebpackPlugin = require('mini-css-extract-plugin')
-const UglifyjsWebpackPlugin = require('uglifyjs-webpack-plugin')
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCssAssetsWebpackPlugin = require("mini-css-extract-plugin");
+const UglifyjsWebpackPlugin = require("uglifyjs-webpack-plugin");
+const webpack = require("webpack");
 
 module.exports = {
-
-
   // mode
   //  1. mode: 表示模式
   //      - development 开发环境
   //      - production  生产环境
-  mode: 'development',
-
+  mode: "development",
 
   // entry
   //  1. entry 表示thunk的入口点
@@ -27,24 +25,23 @@ module.exports = {
   //      - 1. entry设置为 ( 对象模式 )，则可以指定 ( 多个入口 )
   //      - 2. output的 ( filename ) 设置为 ('[name].[hash:8].js' ) 的形式，使用 ( 占位符 ) 则可以分别打包为不同的 ( 出口文件 )
   //      - 3. plugins 数组中需要多次 ( new HtmlWebpackPlugin() )，具体如下
-            // plugins: [
-            //   new HtmlWebpackPlugin({ // ---------------------------- html-webpack-plugin可以new多个
-            //     template: './src/index.html', // 模版html
-            //     filename: 'home.html', // 打包后的html文件名
-            //     chunks: ['home'] // --------------------------------- 每个chunk对应加载哪些打包后的 js 文件，即 output指定的输出js文件
-            //   }),
-            //   new HtmlWebpackPlugin({
-            //     template: './src/index.html',
-            //     filename: 'other.html',
-            //     chunks: ['other']
-            //   }),
-            // ]
+  // plugins: [
+  //   new HtmlWebpackPlugin({ // ---------------------------- html-webpack-plugin可以new多个
+  //     template: './src/index.html', // 模版html
+  //     filename: 'home.html', // 打包后的html文件名
+  //     chunks: ['home'] // --------------------------------- 每个chunk对应加载哪些打包后的 js 文件，即 output指定的输出js文件
+  //   }),
+  //   new HtmlWebpackPlugin({
+  //     template: './src/index.html',
+  //     filename: 'other.html',
+  //     chunks: ['other']
+  //   }),
+  // ]
 
   entry: {
-    main: './src/index.js', // 这里entry是一个对象，main 就是打包后的 thunk 名称
-    other: './src/other.js'
+    main: "./src/index.js", // 这里entry是一个对象，main 就是打包后的 thunk 名称
+    other: "./src/other.js",
   },
-
 
   // output
   //  1. filename
@@ -85,11 +82,10 @@ module.exports = {
 
   output: {
     // filename: '[name].[hash:8].js',
-    filename: '[name].[chunkhash:8].js',
+    filename: "[name].[chunkhash:8].js",
     // filename: '[name].[content:8].js',
-    path: path.resolve(__dirname, 'build')
+    path: path.resolve(__dirname, "build"),
   },
-
 
   // devServer
   //  1. proxy
@@ -99,9 +95,10 @@ module.exports = {
   //      - contentBase: 表示服务器的内容来源
   //      - contentBase需要和output.path保持一致
   //  3. host主机 port端口 compress开启gzip压缩 hot开启热更新
-  devServer: { // 开发服务器配置项
-    contentBase: path.join(__dirname, 'build'),
-    host: 'localhost', // 主机，可以从外部访问
+  devServer: {
+    // 开发服务器配置项
+    contentBase: path.join(__dirname, "build"),
+    host: "localhost", // 主机，可以从外部访问
     port: 5555,
     compress: true, // 开启 gzip 压缩
     open: true, // 启动后，打开浏览器
@@ -122,7 +119,6 @@ module.exports = {
     //   }
     // }
   },
-
 
   // module
   //  1. loader --------------------------------------------------------------------- loader
@@ -156,10 +152,7 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        use: [
-          {loader: 'style-loader'},
-          {loader: 'css-loader'}
-        ]
+        use: [{ loader: "style-loader" }, { loader: "css-loader" }],
       },
       // { // 非单独抽离，插入html的head部分
       //   test: /\.scss$/,
@@ -169,20 +162,21 @@ module.exports = {
       //     {loader: 'sass-loader'},
       //   ]
       // },
-      { // 单独抽离
+      {
+        // 单独抽离
         test: /\.scss$/,
         use: [
           MiniCssExtractPlugin.loader,
-          {loader: 'css-loader'},
-          {loader: 'postcss-loader'}, // 先处理sass => 处理前缀 => 处理@import => 抽离css
-          {loader: 'sass-loader'},
-        ]
+          { loader: "css-loader" },
+          { loader: "postcss-loader" }, // 先处理sass => 处理前缀 => 处理@import => 抽离css
+          { loader: "sass-loader" },
+        ],
       },
       {
         test: /\.js$/,
         use: [
           {
-            loader: 'babel-loader', // options已在 .babelrc 文件中单独配置
+            loader: "babel-loader", // options已在 .babelrc 文件中单独配置
             // options: { // ------------- use数组中如果是对象的方式，则可以配置 ( options配置对象 ) 和 ( loader ) 等
             //   presets: [
             //     ['@babel/preset-env'],
@@ -194,30 +188,34 @@ module.exports = {
             //     ['@babel/plugin-syntax-dynamic-import'],
             //   ]
             // }
-          }
-        ]
+          },
+        ],
+      },
+      // 加载自定义的 loader - replaceLoader
+      {
+        test: /\.js$/,
+        use: [path.resolve(__dirname, "./loaders/replace-loader.js")],
       },
       {
         test: /\.(png|jpg|jpeg|git)$/,
         use: [
           {
-            loader: 'url-loader',
+            loader: "url-loader",
             options: {
               limit: 200 * 1024, // 小于200k转成base64, 大于200k使用file-laoder来处理加载图片
               esModule: false, // 用于html-withimg-plugin生效
-              outputPath: 'img/', // 输出到 img 文件夹中
-              publicPath: '' // 单独配置img的公共路径，而不是在output中全部配置
-            }
-          }
-        ]
+              outputPath: "img/", // 输出到 img 文件夹中
+              publicPath: "", // 单独配置img的公共路径，而不是在output中全部配置
+            },
+          },
+        ],
       },
       {
         test: /\.html$/,
-        use: 'html-withimg-loader'
-      }
-    ]
+        use: "html-withimg-loader",
+      },
+    ],
   },
-
 
   // plugins
   //  1. html-webpack-plugin
@@ -234,8 +232,8 @@ module.exports = {
   //      - optimization.minimizer
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html',
-      filename: 'index.html', // 打包过后的html的文件名
+      template: "./src/index.html",
+      filename: "index.html", // 打包过后的html的文件名
       hash: true, // 在打包后的build文件夹中的html文件引入资源时，是否加hash串
       // minify: {
       //   removeAttributeQuotes: true, // 删除html属性的双引号
@@ -243,9 +241,10 @@ module.exports = {
       // }
       // chunks: ['home']
     }),
-    new HtmlWebpackPlugin({ // 打包多页应用时，可以指定 chunks
-      template: './src/index.html',
-      filename: 'other.html', // 打包过后的html的文件名
+    new HtmlWebpackPlugin({
+      // 打包多页应用时，可以指定 chunks
+      template: "./src/index.html",
+      filename: "other.html", // 打包过后的html的文件名
       hash: true, // 在打包后的build文件夹中的html文件引入资源时，是否加hash串
       // minify: {
       //   removeAttributeQuotes: true, // 删除html属性的双引号
@@ -254,35 +253,33 @@ module.exports = {
       // chunks: ['other']
     }),
     new MiniCssExtractPlugin({
-      filename: 'css/main.css', // 指定被打包后的文件夹，和文件名
+      filename: "css/main.css", // 指定被打包后的文件夹，和文件名
       // filename: 'main.css', 抽离出来的css文件名
-    })
+    }),
+    new webpack.DefinePlugin({
+      AUTH: JSON.stringify("AUTH_NAME"), // --- 需要使用 JSON.stringify()
+    }),
   ],
-
 
   // optimization
   //  - optimization 优化项 (optimization：是最佳优化的意思)
   //  1. 压缩打包后的css和js
   //    - 压缩过后的css，js都只有一行
   //    - 注意：压缩css和js要在 ( mode=production ) 中才能看到效果，和 html的优化一样
-  optimization: { 
-    minimizer: [ // 
+  optimization: {
+    minimizer: [
       new OptimizeCssAssetsWebpackPlugin(),
       new UglifyjsWebpackPlugin({
         cache: true,
         parallel: true, // 平行，并行的意思
         sourceMap: true, // 调试映射
-      })
-    ]
+      }),
+    ],
   },
-  resolve: {
-    // resolve.fallback 是 webpack5 新增加的配置
-    fallback: {
-      path: require.resolve("path-browserify"), // path相关，需要使用path需要这样设置，因为webpack5把polyfill单独抽离了
-    },
-  },
-}
-
-
-// bundle
-// 1. bundle由chunk组成
+  // resolve.fallback 是 webpack5 新增加的配置，我们这里安装的是 webpack4，所以把代码注释掉
+  // resolve: {
+  //   fallback: {
+  //     path: require.resolve("path-browserify"), // path相关，需要使用path需要这样设置，因为webpack5把polyfill单独抽离了
+  //   },
+  // },
+};
