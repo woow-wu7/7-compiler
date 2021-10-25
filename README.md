@@ -50,8 +50,12 @@
   - 从右往左，上下往上
 
 
+
 ---
 ---
+---
+
+
 # (二) webpack 基础学习
 
 ### 一些单词
@@ -70,6 +74,31 @@ decorators: 装饰工
 uglify: 丑陋的 // uglifyjs-webpack-plugin压缩js为一行，丑
 ```
 
+### 一些基础知识
+- webpack是什么？
+  - webpack是一个 ( 模块打包工具 )
+  - 打包js文件: 最基本的就是打包 ( js ) 文件
+  - 打包其他文件: 如果添加了 ( loader ) 则可以打包其他任何类型的文件
+- 特点
+  - 默认配置
+    - 0配置：可以不需要任何配置文件，即0配置；不过在真实的项目中还是需要通过 webpack.config.js 去配置webpack，打包我们想要的资源
+    - 命令：npx webpack xxx.js
+    - 默认打包后生成的文件夹：dist
+    - 默认打包后生成的文件：main.js
+    - 默认加载的配置文件：webpack.config.js || webpackfile.js
+    - 指定自定义的配置文件：npx webpack --config xxxxx
+- 一些面试题
+  - hash chunkhash contenthash 的区别
+  - 请看 webpack.config.js 中的 output
+
+
+### 环境配置
+- 安装相关依赖
+  - npm install webpack webpack-cli -D // 只是开发时依赖，线上使用打包后的文件
+  - npm install -D webpack-dev-server
+  - // webpack-dev-server 用于实现一个简单的web服务，1.在webpack.config.js中配置；2.在package.json的script中写入命令启动 `dev: webpack-dev-server`
+  - npm install -D html-webpack-plugin
+
 ### (1) 启动开发服务器express，并直接在浏览器中显示打包后的网页
 - **webpack-dev-server**
   - npm install -D webpack-dev-server
@@ -77,7 +106,7 @@ uglify: 丑陋的 // uglifyjs-webpack-plugin压缩js为一行，丑
   - 可以指定需要启动静态服务的文件夹，并通过命令 webpack-dev-server 来启动静态服务
   - 可以直接配置到 package.json 的 scripts 命令中去，比如： scripts: { "dev": "webpack-dev-server"}
 - **html-webpack-plugin**
-  - 安装: npm install -D html-webpack-plugin 
+  - 安装: npm install -D html-webpack-plugin
   - 作用: 指定模板html，并将该html打包到output.path指定的文件夹中，并自动引入打包后的js等资源文件
   - 可以指定template,filename,hash等
 

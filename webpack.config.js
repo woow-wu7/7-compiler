@@ -75,7 +75,14 @@ module.exports = {
   //            - 使用chunkhash，如果index.css被index.js引用了，那么 ( css文件和js文件 ) 就会 ( 共用相同的chunkhash值 )
   //            - 如果index.js更改了代码，css文件就算内容没有任何改变，由于是该模块发生了改变，导致css文件会重复构建
   //          - 3. 解决方法
-  //            - 使用extra-text-webpack-plugin里的contenthash值，保证即使css文件所处的模块里就算其他文件内容改变，只要css文件内容不变，那么不会重复构建。
+  //            - 使用 ( mini-css-extract-plugin ) 里的 ( contenthash ) 值，保证即使css文件所处的模块里就算其他文件内容改变，只要css文件内容不变，那么不会重复构建
+  //      - 总结
+  //          - hash(任何一个文件修改，整个打包所有文件的hash都会改变)： - 是根据整个项目构建，要项目里有文件更改，整个项目构建的hash值都会更改，并且全部文件都共用相同的hash值
+  //          - chunkhash(只影响到不同entry划分的chunk)：chunkhash根据不同的入口文件(Entry)进行依赖文件解析、构建对应的代码块（chunk），生成对应的哈希值，某文件变化时只有该文件对应代码块（chunk）的hash会变化
+  //          - contentHash(即使是相同chunk的js和css，改动js只会影响对应的js而不会影响到css)：每一个代码块（chunk）中的js和css输出文件都会独立生成一个hash，当某一个代码块（chunk）中的js源文件被修改时，只有该代码块（chunk）输出的js文件的hash会发生变化
+  //  4. 在哪些地方可以使用到 hash chunkhash contenthash
+  //      - 凡是在 webpack.config.js 中具有 ( filename ) 属性的地方都可以使用 ( 占位符的方式 [hash] ) 使用到这几种hash
+
   output: {
     // filename: '[name].[hash:8].js',
     filename: '[name].[chunkhash:8].js',
@@ -267,7 +274,13 @@ module.exports = {
         sourceMap: true, // 调试映射
       })
     ]
-  }
+  },
+  resolve: {
+    // resolve.fallback 是 webpack5 新增加的配置
+    fallback: {
+      path: require.resolve("path-browserify"), // path相关，需要使用path需要这样设置，因为webpack5把polyfill单独抽离了
+    },
+  },
 }
 
 
