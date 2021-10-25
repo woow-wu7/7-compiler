@@ -197,12 +197,12 @@ module.exports = {
         use: [path.resolve(__dirname, "./loaders/replace-loader.js")],
       },
       {
-        test: /\.(png|jpg|jpeg|git)$/,
+        test: /\.(png|jpg|jpeg|gif)$/,
         use: [
           {
             loader: "url-loader",
             options: {
-              limit: 200 * 1024, // 小于200k转成base64, 大于200k使用file-laoder来处理加载图片
+              limit: 200 * 1024, // 小于200k转成base64, 大于200k使用file-loader来处理加载图片
               esModule: false, // 用于html-withimg-plugin生效
               outputPath: "img/", // 输出到 img 文件夹中
               publicPath: "", // 单独配置img的公共路径，而不是在output中全部配置

@@ -87,17 +87,25 @@ uglify: 丑陋的 // uglifyjs-webpack-plugin压缩js为一行，丑
     - 默认打包后生成的文件：main.js
     - 默认加载的配置文件：webpack.config.js || webpackfile.js
     - 指定自定义的配置文件：npx webpack --config xxxxx
+- 一些链接
+  - 2021/10/25复习时，新开的webpack复习项目：https://github.com/woow-wu7/6-review/tree/main/JS/webpack
 - 一些面试题
+  - 1
   - hash chunkhash contenthash 的区别
   - 请看 webpack.config.js 中的 output
 
 
+
 ### 环境配置
 - 安装相关依赖
-  - npm install webpack webpack-cli -D // 只是开发时依赖，线上使用打包后的文件
-  - npm install -D webpack-dev-server
-  - // webpack-dev-server 用于实现一个简单的web服务，1.在webpack.config.js中配置；2.在package.json的script中写入命令启动 `dev: webpack-dev-server`
+  - npm install -D webpack webpack-cli  // 只是开发时依赖，线上使用打包后的文件
   - npm install -D html-webpack-plugin
+  - npm install -D webpack-dev-server
+    - webpack-dev-server 用于实现一个简单的web服务
+    - 1.在webpack.config.js中配置；
+    - 2.在package.json的script中写入命令启动 `dev: webpack-dev-server`
+  - 详见下面的(1)(2)(3)(4)(5)
+
 
 ### (1) 启动开发服务器express，并直接在浏览器中显示打包后的网页
 - **webpack-dev-server**
