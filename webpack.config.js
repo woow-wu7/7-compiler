@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsWebpackPlugin = require("mini-css-extract-plugin");
 const UglifyjsWebpackPlugin = require("uglifyjs-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 
 module.exports = {
@@ -118,6 +119,22 @@ module.exports = {
     //     secure: false,
     //   }
     // }
+  },
+
+  // devtool
+  // - source-map
+  // - eval-source-map
+  devtool: "source-map", // 显示行数，产生map文件
+  // devtool: 'eval-source-map', // 显示行数，不产生map文件
+
+  resolve: {
+    // resolve.fallback 是 webpack5 新增加的配置
+    // fallback: {
+    //   path: require.resolve("path-browserify"), // path相关
+    // },
+    alias: {
+      "@images": path.resolve(__dirname, "./src/images"), // 设置别名
+    },
   },
 
   // module
@@ -252,6 +269,24 @@ module.exports = {
       // }
       // chunks: ['other']
     }),
+    // copy-webpack-plugin
+    // 这是webpack5的配置，本项目中用到的webpack4，所以不能使用这种写法
+    // 报错信息：TypeError: compilation.getCache is not a function
+    // 解决办法：移除copy-webpack-plugin, 安装5.0版本的copy-webpack-plugin即可解决！
+    // new CopyWebpackPlugin({
+    //   patterns: [
+    //     {
+    //       from: path.resolve(__dirname, "./toCopyConsume"), // 将 toCopyConsume 中的文件拷贝到 to中的文件夹中
+    //       to: "./", // 将会拷贝到打包后的文件中的根目录，比如build文件夹
+    //     },
+    //   ],
+    // }),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, "./toCopyConsume"), // 将 toCopyConsume 中的文件拷贝到 to中的文件夹中
+        to: "./", // 将会拷贝到打包后的文件中的根目录，比如build文件夹
+      },
+    ]),
     new MiniCssExtractPlugin({
       filename: "css/main.css", // 指定被打包后的文件夹，和文件名
       // filename: 'main.css', 抽离出来的css文件名
@@ -259,6 +294,7 @@ module.exports = {
     new webpack.DefinePlugin({
       AUTH: JSON.stringify("AUTH_NAME"), // --- 需要使用 JSON.stringify()
     }),
+    new webpack.BannerPlugin({ banner: " by woow_wu7" }), // webpack自带的plugin，用于在js文件开头注释一些说明内容
   ],
 
   // optimization

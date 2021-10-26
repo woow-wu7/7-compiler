@@ -6,7 +6,9 @@ require("@babel/polyfill");
 
 // 1
 // 图片相关
-import one from "./images/1.jpg";
+// import one from "./images/1.jpg";
+import one from "@images/1.jpg"; // 测试设置了 resolve.alias 之后的使用
+
 function useJsGeneratorImg() {
   const divDOM = document.createElement("div");
   divDOM.setAttribute("style", "background: yellow;");
