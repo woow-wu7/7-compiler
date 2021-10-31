@@ -36,3 +36,10 @@ console.log(index);
 // 3
 console.log(`AUTH`, AUTH); // 测试 webpack.DefinePlugin
 console.log("hello"); // 测试 replaceLoader，将 hello -> hi
+
+// 4
+// 优化前：引入 jquery 和 lodash 测试打包速度
+// 优化后：使用 module.noParse 在 loader 解析时去实现 打包的库没有依赖任何其他库时，不去寻找该库的依赖关系，提高打包速度
+const lodash = require('lodash')
+const jquery = require('jquery')
+console.log(lodash, jquery)

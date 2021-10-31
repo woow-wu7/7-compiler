@@ -9,6 +9,7 @@
 ### 说明
 - `webpack.config.7compiler.js` 是传入 `7-compiler.js` 用于手写 `Compiler` 的配置文件
 - `webpack.config.js` 是用来学习webpack基础的配置文件
+- `webpack.config.prod.js` 是用来测试 `webpack-merge` 合并配置的插件，用来复用配置
 - `cnpm run 7-pack`: 使用自己的 Compiler 打包
 - `cnpm run build`: 使用 webpack 打包
 
@@ -28,7 +29,7 @@
 ### (3) 自定义命令
 - `cnpm run build`: 使用 webpack 打包
 - `cnpm run 7-pack`: 使用自己的 Compiler 打包
-- 具体看 `package.json` 中的配置 
+- 具体看 `package.json` 中的配置
 
 
 ### (4) Plugin
@@ -167,3 +168,53 @@ uglify: 丑陋的 // uglifyjs-webpack-plugin压缩js为一行，丑
 - html-withimg-loder
 - `npm install file-loader url-loader html-withimg-loader -D`
 - [url-loader官网说明](https://webpack.docschina.org/loaders/url-loader/#root)
+
+
+
+
+
+---
+---
+---
+
+
+
+# (三) webpack 优化
+
+### (1) noParse
+- `module.noParse`
+- 作用
+  - 如果：包没有其他的依赖项，则可以通过 ( module.noParse ) 使 ( webpack不去解析该包的依赖关系 )，提高构建速度
+  - 所以：该包中：不能含有import，require，define等任何的导入机制
+- 实例
+  - 比如：我们安装了 jquery 和 lodash 两个库
+  - 因为：我们知道这两个库没有依赖其他任何的别的库，即没有依赖项，所以在webpack解析时不去查找该库的依赖关系提升打包速度
+```
+module: {
+  noParse: /jquery|lodash/, // ------ 不去解析jquery或lodash的依赖关系，因为它们俩都没有依赖其他库，从而提高构建速度
+  rules: []
+}
+```
+
+### (2) include 和 exclude
+- 在配置 `module.rules` 数组中，每个对象成员中设置 include 和 exclude 来缩小 ( 查找匹配文件的范围 )
+- 原理
+  - 因为：在module.rules数组中，是配置loader的地方
+  - 因为：loader在寻找需要匹配文件时(loader需要匹配的文件通过test正则指定)，默认是会去寻找 ( node_modules ) 文件的，而我们真正需要用loader去解析的文件是我们自己开发的文件
+  - 所以：
+    - 可以通过 exclude 来指定哪些文件范围是不需使用loader去解析的
+    - 可以通过 include 来制定哪些文件范围是需要时使用loader去解析的
+```
+module: {
+  noParse: /xxxx/,
+  rules: [
+    {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader'
+      }
+    }
+  ]
+}
+```

@@ -166,6 +166,7 @@ module.exports = {
   //      - file-loader
   //      - url-loader // 当图片小于阈值时转成base64，大于于阈值时使用file-loader
   module: {
+    noParse: /jquery|lodash/, // ------ 不去解析jquery或lodash的依赖关系，因为它们俩都没有依赖其他库，从而提高构建速度
     rules: [
       {
         test: /\.css$/,
@@ -182,6 +183,7 @@ module.exports = {
       {
         // 单独抽离
         test: /\.scss$/,
+        exclude: /node_modules/,
         use: [
           MiniCssExtractPlugin.loader,
           { loader: "css-loader" },
@@ -191,6 +193,7 @@ module.exports = {
       },
       {
         test: /\.js$/,
+        exclude: /node_modules/,
         use: [
           {
             loader: "babel-loader", // options已在 .babelrc 文件中单独配置
