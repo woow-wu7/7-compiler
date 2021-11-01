@@ -8,7 +8,7 @@
 
 ### 资料
 - [手写webpack-Compiler - 我的掘金文章](https://juejin.cn/post/6844903973002936327)
-- [webapck基础 - 我的掘金文章](https://juejin.cn/post/6844904070201753608#heading-0)
+- [webpack基础 - 我的掘金文章](https://juejin.cn/post/6844904070201753608#heading-0)
 - [思维导读](https://github.com/woow-wu7/7-compiler/tree/main/src/images/Compiler.png)
 ### 说明
 - `webpack.config.7compiler.js` 是传入 `7-compiler.js` 用于手写 `Compiler` 的配置文件
@@ -258,3 +258,60 @@ moment.locale("zh-cn"); // 使用zh-cn语言包，未做优化前，虽然只使
 const time = moment().format("MMMM Do YYYY, h:mm:ss a");
 console.log(`time`, time);
 ```
+
+### (4) DllPlugin 和 DllReferencePlugin
+- 安装
+  - 首先我们安装 cnpm install react react-dom -S
+  - 然后我们安装 cnpm install @babel/preset-env @babel/preset-react
+- 配置
+  - 在使用babel-loader的地方做如下配置
+```
+webpack.config.js
+-------
+{
+  test: /\.js$/,
+  exclude: /node_modules/,
+  use: [
+    {
+      loader: "babel-loader",
+      options: {
+        presets: [
+          ['@babel/preset-env'],
+          ['@babel/preset-react']
+        ],
+      }
+    },
+  ],
+}
+```
+- 使用react
+```
+index.js
+-------
+
+import React from 'react'
+import ReactDOM from 'react-dom'
+console.log(ReactDOM.render, 'ReactDOM.render')
+ReactDOM.render(<h1>jsx</h1>, document.getElementById('root')) // 在root节点中插入h1标签的内容，默认会作为第一个子元素
+```
+- **优化需求说明**
+  - 因为：我们上面安装了react和reactDOM，但是我们每次修改业务代码后，从新打包都要再把react和reactDOM再打包一次
+  - 但是：但是它们是第三方库，并没有修改过这些第三方包，是不需要重新打包的
+  - 所以：我们可以把react和reactDOM等这些第三方包单独打包，然后引用打包好的第三方文件，在之后修改业务文件后，还是直接引用打包后的第三方包，就不用再从新打包第三方包了
+  - 最终：提高了打包的速度
+  - 实现：我们通过 动态连结库 来实现
+```
+1
+webpack.config.js中的output配置项目
+- library
+- libraryTarget
+-------
+
+output: {
+  filename: "[name].[hash:8].js",
+  path: path.resolve(__dirname, "build"),
+  library: '[name]', // 将打包后的模块赋值给变量，变量的命名是entry对象中制定的key，并导出；当然这里也可以指定具体的变量值，比图 library: 'abc'
+  libraryTarget: 'commonjs' // 使用commonjs的方式导出，即 export.default 的方式导出
+},
+```
+

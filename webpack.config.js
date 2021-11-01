@@ -82,10 +82,12 @@ module.exports = {
   //      - 凡是在 webpack.config.js 中具有 ( filename ) 属性的地方都可以使用 ( 占位符的方式 [hash] ) 使用到这几种hash
 
   output: {
-    // filename: '[name].[hash:8].js',
-    filename: "[name].[chunkhash:8].js",
+    filename: "[name].[hash:8].js",
+    // filename: "[name].[chunkhash:8].js",
     // filename: '[name].[content:8].js',
     path: path.resolve(__dirname, "build"),
+    library: '[name]', // 将打包后的模块赋值给变量，并导出
+    // libraryTarget: 'commonjs' // 使用commonjs的方式导出，即 export.default 的方式导出
   },
 
   // devServer
@@ -197,17 +199,16 @@ module.exports = {
         use: [
           {
             loader: "babel-loader", // options已在 .babelrc 文件中单独配置
-            // options: { // ------------- use数组中如果是对象的方式，则可以配置 ( options配置对象 ) 和 ( loader ) 等
-            //   presets: [
-            //     ['@babel/preset-env'],
-            //   ],
-            //   plugins: [
-            //     ['@babel/plugin-proposal-decorators', {'legacy': true}],
-            //     ['@babel/plugin-proposal-class-properties', {'loose': true}],
-            //     ['@babel/plugin-transform-runtime'],
-            //     ['@babel/plugin-syntax-dynamic-import'],
-            //   ]
-            // }
+            options: {
+              // ------------- use数组中如果是对象的方式，则可以配置 ( options配置对象 ) 和 ( loader ) 等
+              presets: [["@babel/preset-env"], ["@babel/preset-react"]],
+              // plugins: [
+              //   ['@babel/plugin-proposal-decorators', {'legacy': true}],
+              //   ['@babel/plugin-proposal-class-properties', {'loose': true}],
+              //   ['@babel/plugin-transform-runtime'],
+              //   ['@babel/plugin-syntax-dynamic-import'],
+              // ]
+            },
           },
         ],
       },
@@ -241,13 +242,13 @@ module.exports = {
   //  1. html-webpack-plugin
   //      - 主要作用：将模板html打包到output指定的文件夹，并实现自动引入依赖打包后的其他资源
   //      - template: 指定模板html
-  //      - filename: templatee模板html文件打包后的html的名字
+  //      - filename: template模板html文件打包后的html的名字
   //      - hash: 打包后的html引入资源的名字是否加上hash
   //  2. mini-css-extract-plugin
   //      - 主要作用：单独抽离css，sass等
   //      - 在plugins中: new MiniCssExtractPlugin()
   //      - 在module.rules中: MiniCssExtractPlugin.loader
-  //  3. optimize-css-assets-webpack-plugin 和  uglifyjs-wewbpack-plugin 一起来压缩css和js
+  //  3. optimize-css-assets-webpack-plugin 和  uglifyjs-webpack-plugin 一起来压缩css和js
   //      - 主要在 production生产环境才需要压缩css和js
   //      - optimization.minimizer
   plugins: [

@@ -54,3 +54,11 @@ require("moment/locale/zh-cn");
 moment.locale("zh-cn"); // 使用zh-cn语言包，未做优化前，虽然只使用了一个语言包zh-cn，但是会打包所有的 ./local 文件，里面包含所有的语言包
 const time = moment().format("MMMM Do YYYY, h:mm:ss a");
 console.log(`time`, time);
+
+// 6
+// react
+import React from 'react'
+import ReactDOM from 'react-dom'
+console.log(ReactDOM.render, 'ReactDOM.render')
+ReactDOM.render(<h1>jsx</h1>, document.getElementById('root'))
+
