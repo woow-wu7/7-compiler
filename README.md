@@ -1,4 +1,4 @@
-# 手写webpack-Compiler
+# (一)手写webpack-Compiler
 - 新建 7-compiler 文件夹
 - yarn init -y 或者 npm init -y 来初始化项目
 
@@ -202,8 +202,8 @@ module: {
   - 因为：在module.rules数组中，是配置loader的地方
   - 因为：loader在寻找需要匹配文件时(loader需要匹配的文件通过test正则指定)，默认是会去寻找 ( node_modules ) 文件的，而我们真正需要用loader去解析的文件是我们自己开发的文件
   - 所以：
-    - 可以通过 exclude 来指定哪些文件范围是不需使用loader去解析的
-    - 可以通过 include 来制定哪些文件范围是需要时使用loader去解析的
+    - 可以通过 exclude 来指定哪些文件范围是不需使用loader去解析的，是一个正则
+    - 可以通过 include 来制定哪些文件范围是需要时使用loader去解析的，是一个正则
 ```
 module: {
   noParse: /xxxx/,
@@ -217,4 +217,40 @@ module: {
     }
   ]
 }
+```
+
+### (3) webpack.IgnorePlugin
+- 作用
+  - 如果引入了一个库，要忽略掉这个库引入的文件时候，可以使用 webpack.ignorePlugin
+```
+// 0
+// 比如我们的业务代码中使用到了下面的代码
+// webpack.IgnorePlugin()
+// moment
+// 优化前：moment内部默认会去加载所有的语言包，但是一般情况我们也只会用到中文或英文，导致moment打包后的文件比较大
+// 优化后：使用 webpack.IgnorePlugin 内置插件，忽略掉moment中引入的 ./local 中的所有文件，我们自己手动引入需要的其中一两个文件即可
+// 具体步骤：
+//  - 看第2步
+//  - 然后在需要使用 local 的地方，手动引入
+
+1. 优化过程0
+const moment = require("moment");
+moment.locale("zh-cn"); // 使用zh-cn语言包，未做优化前，虽然只使用了一个语言包zh-cn，但是会打包所有的 ./local 文件，里面包含所有的语言包
+const time = moment().format("MMMM Do YYYY, h:mm:ss a");
+console.log(`time`, time);
+
+
+2. 优化过程1
+plugins: [
+  new webpack.IgnorePlugin(/\.\/local/, /moment/), // 表示从moment中如果引入了 ./local 文件路径，则把 ./local  中的所有文件忽略掉
+],
+
+
+3. 优化过程2
+在第 0 步中，我们在手动引入local
+const moment = require("moment");
+require('moment/local/zh-cn')
+moment.locale("zh-cn"); // 使用zh-cn语言包，未做优化前，虽然只使用了一个语言包zh-cn，但是会打包所有的 ./local 文件，里面包含所有的语言包
+const time = moment().format("MMMM Do YYYY, h:mm:ss a");
+console.log(`time`, time);
 ```

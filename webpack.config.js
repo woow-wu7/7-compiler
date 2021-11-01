@@ -298,6 +298,7 @@ module.exports = {
       AUTH: JSON.stringify("AUTH_NAME"), // --- 需要使用 JSON.stringify()
     }),
     new webpack.BannerPlugin({ banner: " by woow_wu7" }), // webpack自带的plugin，用于在js文件开头注释一些说明内容
+    new webpack.IgnorePlugin(/\.\/local/, /moment/), // 表示从moment中如果引入了 ./local 文件路径，则把 ./local  中的所有文件忽略掉
   ],
 
   // optimization
