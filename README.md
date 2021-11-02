@@ -351,7 +351,7 @@ output: {
     - 我们在js引入react和react-dom时，是需要告诉webpack去打包好的react和react-dom包路径中去查找，而不是去node_modules中查找并打包
     - 即：先去 ( dll动态链接库 ) 中查找，找不到再去node_modules中查找并打包
     - 所以：引入webpack.DllReferencePlugin 去 ( 引用动态链接库 )
-  - 4. **webpack.DllReferencePlugin**
+  - 4.**webpack.DllReferencePlugin**
     - 在 **webpack.config.js** 中做如下配置
     -  `new webpack.DllReferencePlugin({manifest: path.resolve(__dirname, 'dist', 'manifest.json')})`
 
