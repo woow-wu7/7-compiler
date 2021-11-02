@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <!-- template 模板 -->
-  <div class="root" id="root">
-    <div class="title">webpack rootDOM title</div>
-    <div class="img-container"></div>
-    <div style="background:rgb(167, 255, 179);padding: 4px;">
-      <img src="./images//1.jpg" alt="logo" width="300" height="300">
-      <span>直接在html中引入img</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- template 模板 -->
+    <div class="root" id="root">
+      <div class="title">webpack rootDOM title</div>
+      <div class="img-container"></div>
+      <div style="background: rgb(167, 255, 179); padding: 4px">
+        <img src="./images//1.jpg" alt="logo" width="300" height="300" />
+        <span>直接在html中引入img</span>
+      </div>
     </div>
-  </div>
-</body>
+
+    <!-- 引入动态链接库中打包好的第三方包 -->
+    <script src="./dist/dll_react.js"></script>
+  </body>
 </html>

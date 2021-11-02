@@ -260,6 +260,17 @@ console.log(`time`, time);
 ```
 
 ### (4) DllPlugin 和 DllReferencePlugin
+- 动态链接库
+  - **DllPlugin**
+    - 主要用来单独打包第三方包时，生成一个json的任务清单
+    - `name`
+    - `path`
+  - **DllReferencePlugin**
+    - 主要作用就是 ( 引用动态连结库 )
+    - 我们在模版html中，手动引入打包好的第三方包时，告诉webpack先去 （ dll动态链接库 ) 中查找
+    - `manifest`
+  - webpack.DllPlugin
+  - webpack.DllReferencePlugin
 - 安装
   - 首先我们安装 cnpm install react react-dom -S
   - 然后我们安装 cnpm install @babel/preset-env @babel/preset-react
@@ -314,4 +325,32 @@ output: {
   libraryTarget: 'commonjs' // 使用commonjs的方式导出，即 export.default 的方式导出
 },
 ```
+- **需求实现的具体流程**！！！！！！！！！
+  - **webpack.DllPlugin**
+    - 是webpack内置的插件
+      - 其他的内置插件还有：
+      - webpack.DefinePlugin 定义环境变量，相当于全局常量
+      - webpack.IgnorePlugin 忽略第三方包引入的文件或者文件夹
+      - webpack.ProvidePlugin 暴露包的名字，改名
+      - webpack.BannerPlugin 打包的js的最前面注入一些信息字符串，是注释性的代码
+  - 1.新建 **webpack.config.react.js** // 用来专门打包react和react-dom的webpack配置文件
+    - entry:{react:['react', 'react-dom']} // 设置入口
+    - output中添加
+      - filename
+      - path
+      - library(打包后赋值给变量)
+      - libraryTarget(变量的类型，比如var，commonjs，umd)
+    - 引入webpack.DllPlugin插件
+      - name
+      - path
+        - path最终是指定的一个`json`文件
+        - manifest.json，我们一般叫做任务清单
+  - 2.因为：在模版html中手动引入打包好的第三方包，但是webpack并知道指定的script标签中的src路径
+  - 3.所以：
+    - 我们在js引入react和react-dom时，是需要告诉webpack去打包好的react和react-dom包路径中去查找，而不是去node_modules中查找并打包
+    - 即：先去 ( dll动态链接库 ) 中查找，找不到再去node_modules中查找并打包
+    - 所以：引入webpack.DllReferencePlugin 去 ( 引用动态链接库 )
+  - 4. **webpack.DllReferencePlugin**
+    - 在 **webpack.config.js** 中做如下配置
+    -  `new webpack.DllReferencePlugin({manifest: path.resolve(__dirname, 'dist', 'manifest.json')})`
 

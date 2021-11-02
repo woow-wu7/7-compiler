@@ -22,6 +22,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.config.js --color --progress",
+    "build:react": "webpack --config webpack.config.react.js",
     "7-pack": "node ./7-compiler",
     "dev": "webpack-dev-server"
   },

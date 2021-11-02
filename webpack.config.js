@@ -86,8 +86,8 @@ module.exports = {
     // filename: "[name].[chunkhash:8].js",
     // filename: '[name].[content:8].js',
     path: path.resolve(__dirname, "build"),
-    library: '[name]', // 将打包后的模块赋值给变量，并导出
-    // libraryTarget: 'commonjs' // 使用commonjs的方式导出，即 export.default 的方式导出
+    // library: '[name]', // 将打包后的模块赋值给变量，并导出
+    // libraryTarget: 'var' // 1. 使用commonjs的方式导出，即 export.default 的方式导出； 2.可以设置的值比如 var commonjs umd
   },
 
   // devServer
@@ -300,6 +300,23 @@ module.exports = {
     }),
     new webpack.BannerPlugin({ banner: " by woow_wu7" }), // webpack自带的plugin，用于在js文件开头注释一些说明内容
     new webpack.IgnorePlugin(/\.\/local/, /moment/), // 表示从moment中如果引入了 ./local 文件路径，则把 ./local  中的所有文件忽略掉
+    new webpack.DllReferencePlugin({
+      // 1
+      // 作用：
+      // - 引用打包好第三方库的动态链接库
+      // - 如果找不到动态连结库中打包好的第三方包，再进行打包
+      // 功能
+      // - webpack.DllPlugin 在第三方webpack打包配置文件中使用，这里是 webpack.config.react.js
+      // - webpack.DllReferencePlugin 在项目的webpack配置文件中指定
+      // 单词
+      // - manifest：是清单的意思
+      // 最终
+      //  - 完成动态链接库需要配合如下
+      //  - 1. 在 webpack.config.react.js 中使用 webpack.DllPlugin 单独打包，生成动态连结库json文件
+      //  - 2. 在 webpack.config.js 中使用 webpack.DllReferencePlugin 去查找动态链接库
+      //  - 3. 在 模版HTML 中去手动引入打包好的库
+      manifest: path.resolve(__dirname, 'dist', 'manifest.json')
+    }),
   ],
 
   // optimization
