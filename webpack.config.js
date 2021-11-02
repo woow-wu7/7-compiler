@@ -4,6 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsWebpackPlugin = require("mini-css-extract-plugin");
 const UglifyjsWebpackPlugin = require("uglifyjs-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const HappyPack = require("happypack");
 const webpack = require("webpack");
 
 module.exports = {
@@ -86,8 +87,8 @@ module.exports = {
     // filename: "[name].[chunkhash:8].js",
     // filename: '[name].[content:8].js',
     path: path.resolve(__dirname, "build"),
-    // library: '[name]', // 将打包后的模块赋值给变量，并导出
-    // libraryTarget: 'var' // 1. 使用commonjs的方式导出，即 export.default 的方式导出； 2.可以设置的值比如 var commonjs umd
+    // library: "[name]", // 将打包后的模块赋值给变量，并导出
+    // libraryTarget: "var", // 1. 使用commonjs的方式导出，即 export.default 的方式导出； 2.可以设置的值比如 var commonjs umd
   },
 
   // devServer
@@ -193,24 +194,35 @@ module.exports = {
           { loader: "sass-loader" },
         ],
       },
+      // {
+      //   test: /\.js$/,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     {
+      //       loader: "babel-loader", // options已在 .babelrc 文件中单独配置
+      //       options: {
+      //         // ------------- use数组中如果是对象的方式，则可以配置 ( options配置对象 ) 和 ( loader ) 等
+      //         presets: [["@babel/preset-env"], ["@babel/preset-react"]],
+      //         // plugins: [
+      //         //   ['@babel/plugin-proposal-decorators', {'legacy': true}],
+      //         //   ['@babel/plugin-proposal-class-properties', {'loose': true}],
+      //         //   ['@babel/plugin-transform-runtime'],
+      //         //   ['@babel/plugin-syntax-dynamic-import'],
+      //         // ]
+      //       },
+      //     },
+      //   ],
+      // },
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: "babel-loader", // options已在 .babelrc 文件中单独配置
-            options: {
-              // ------------- use数组中如果是对象的方式，则可以配置 ( options配置对象 ) 和 ( loader ) 等
-              presets: [["@babel/preset-env"], ["@babel/preset-react"]],
-              // plugins: [
-              //   ['@babel/plugin-proposal-decorators', {'legacy': true}],
-              //   ['@babel/plugin-proposal-class-properties', {'loose': true}],
-              //   ['@babel/plugin-transform-runtime'],
-              //   ['@babel/plugin-syntax-dynamic-import'],
-              // ]
-            },
-          },
-        ],
+        use: "HappyPack/loader?id=js",
+        // happypack：使用happypack插件，实现多线程打包
+        // 含义：这里表示在打包js文件时，使用的是happypack的loader进行打包
+        // 注意：这里只是表明了使用说明loader，具体的happypack的loader的设置项是在plugins中设置的
+        // 需要配置两个地方
+        // 1. 就是这里的配置
+        // 2. 在plugins中配置
       },
       // 加载自定义的 loader - replaceLoader
       {
@@ -315,7 +327,19 @@ module.exports = {
       //  - 1. 在 webpack.config.react.js 中使用 webpack.DllPlugin 单独打包，生成动态连结库json文件
       //  - 2. 在 webpack.config.js 中使用 webpack.DllReferencePlugin 去查找动态链接库
       //  - 3. 在 模版HTML 中去手动引入打包好的库
-      manifest: path.resolve(__dirname, 'dist', 'manifest.json')
+      manifest: path.resolve(__dirname, "dist", "manifest.json"),
+    }),
+    new HappyPack({
+      id: "js",
+      // id是在 module.rules > use: 'happypack/loader?id=js'中指定的
+      use: [
+        {
+          loader: "babel-loader", // options已在 .babelrc 文件中单独配置
+          options: {
+            presets: [["@babel/preset-env"], ["@babel/preset-react"]],
+          },
+        },
+      ],
     }),
   ],
 

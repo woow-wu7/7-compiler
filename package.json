@@ -21,7 +21,8 @@
     "webpack-cli": "^3.3.11"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js --color --progress",
+    "#build": "webpack --config webpack.config.js --color --progress",
+    "build": "webpack --config webpack.config.js",
     "build:react": "webpack --config webpack.config.react.js",
     "7-pack": "node ./7-compiler",
     "dev": "webpack-dev-server"
@@ -39,6 +40,7 @@
     "css-loader": "^5.0.1",
     "dart-sass": "^1.25.0",
     "file-loader": "^6.2.0",
+    "happypack": "^5.0.1",
     "html-webpack-plugin": "^4.5.1",
     "html-withimg-loader": "^0.1.16",
     "jquery": "^3.6.0",

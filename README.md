@@ -334,6 +334,8 @@ output: {
       - webpack.IgnorePlugin 忽略第三方包引入的文件或者文件夹
       - webpack.ProvidePlugin 暴露包的名字，改名
       - webpack.BannerPlugin 打包的js的最前面注入一些信息字符串，是注释性的代码
+      - webpack.DllPlugin 生成第三方库的动态链接库 manifest.json
+      - webpack.DllReferencePlugin 引用动态链接库，不存在再进行打包
   - 1.新建 **webpack.config.react.js** // 用来专门打包react和react-dom的webpack配置文件
     - entry:{react:['react', 'react-dom']} // 设置入口
     - output中添加
@@ -354,4 +356,42 @@ output: {
   - 4.**webpack.DllReferencePlugin**
     - 在 **webpack.config.js** 中做如下配置
     -  `new webpack.DllReferencePlugin({manifest: path.resolve(__dirname, 'dist', 'manifest.json')})`
+
+
+### (5) happyPack
+- 作用: 开启多线程打包
+- 分类：可以对js类型进行配置happypack进行打包，同时也可以对css等其他资源设置多线程打包
+- 具体设置过程如下
+```
+happypack 多线程打包
+-------
+
+1
+在 webpack.config.js 的 module.rules 中配置解析js文件时使用happypack
+const HappyPack = require("happypack");
+module: {
+  rules: [
+    {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: 'HappyPack/loader?id=js' // 使用happypack插件，实现多线程打包
+    },
+  ]
+}
+
+2. 在 webpack.config.js 的 plugins 中配置如下
+plugins: [
+  new HappyPack({
+   id: "js", // id是在 module.rules > use: 'happypack/loader?id=js'中指定的
+   use: [
+     {
+       loader: "babel-loader", // options已在 .babelrc 文件中单独配置
+       options: {
+         presets: [["@babel/preset-env"], ["@babel/preset-react"]],
+       },
+     },
+   ],
+ }),
+]
+```
 
