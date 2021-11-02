@@ -405,3 +405,30 @@ plugins: [
 - **scope-host**
   - webpack会自动省略一些可以优化的代码
   - 比如声明了多个常量相加，webpack就不会声明多常量，而是把他们合并成一个表达式
+
+
+### (7) 抽离公共代码
+- 使用场景
+  - **当存在多个入口时，同时多个入口使用到了相同的代码时，可以把公共的代码抽离出来**
+  - 比如：index1.js和index2.js两个入口文件，都使用到了a，b两个模块，就可以把a和b单独抽离出来
+```
+splitChunks: {
+  cacheGroups: {
+    common: {
+      name: 'commons',
+      chunks: 'initial',
+      minChunks: 2,
+      priority: 10,
+      minSize: 0,
+    },
+    vendor: { // vendor是小贩的意思
+      test: /node_modules/, // 范围是node_modules中的第三方依赖，注意zhe
+      name: 'vendors', // 抽离出来的包的名字
+      chunks: 'initial', // 初始化加载的时候就抽离公共代码
+      minChunks: 1, // 被引用的次数
+      priority: 11, // priority: 是优先级的意思，数字越大表示优先级越高
+      minSize: 0,
+    }
+  }
+}
+```

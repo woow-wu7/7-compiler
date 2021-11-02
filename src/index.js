@@ -62,3 +62,9 @@ import ReactDOM from 'react-dom'
 console.log(ReactDOM.render, 'ReactDOM.render')
 ReactDOM.render(<h1>jsx</h1>, document.getElementById('root'))
 
+// 7
+// optimization -> splitChunks -> cacheGroups -> commons/venders
+const aaa = require('./a.js')
+const bbb = require('./b.js')
+const ccc = aaa + bbb;
+console.log('index-ccc', ccc)

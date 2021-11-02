@@ -357,6 +357,28 @@ module.exports = {
         sourceMap: true, // 调试映射
       }),
     ],
+    splitChunks: {
+      cacheGroups: {
+        common: {
+          name: "commons",
+          chunks: "initial",
+          minChunks: 2,
+          priority: 10,
+          minSize: 0,
+        },
+        vendor: {
+          // vendor是小贩的意思
+          test: /node_modules/, // 范围是node_modules中的第三方依赖，注意zhe
+          name: "vendors", // 抽离出来的包的名字
+          chunks: "initial", // 初始化加载的时候就抽离公共代码
+          minChunks: 1, // 被引用的次数
+          priority: 11,
+          // priority: 是优先级的意思，数字越大表示优先级越高
+          // 注意对比：common 和 vender 的 priority 权重
+          minSize: 0,
+        },
+      },
+    },
   },
   // resolve.fallback 是 webpack5 新增加的配置，我们这里安装的是 webpack4，所以把代码注释掉
   // resolve: {

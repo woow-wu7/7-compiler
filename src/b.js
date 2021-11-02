@@ -1,2 +1,1 @@
-const a = require("./a.js");
-module.exports = a + "b";
+module.exports = "b";
