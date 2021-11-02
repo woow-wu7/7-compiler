@@ -402,6 +402,6 @@ plugins: [
   - 关键词
     - import
     - tree-shaking
-- scope-host
+- **scope-host**
   - webpack会自动省略一些可以优化的代码
   - 比如声明了多个常量相加，webpack就不会声明多常量，而是把他们合并成一个表达式
