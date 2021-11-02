@@ -395,3 +395,13 @@ plugins: [
 ]
 ```
 
+### (6) webpack的一些自带的优化
+- **tree-shaking**
+  - 当我们使用 `import` 语法时，webpack在打包的时候会自动的去除掉模块中没有使用到的方法和变量，我们叫tree-shaking
+  - 只能是import语法，而不能是require即require不会tree-shaking
+  - 关键词
+    - import
+    - tree-shaking
+- scope-host
+  - webpack会自动省略一些可以优化的代码
+  - 比如声明了多个常量相加，webpack就不会声明多常量，而是把他们合并成一个表达式
