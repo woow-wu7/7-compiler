@@ -432,3 +432,28 @@ splitChunks: {
   }
 }
 ```
+
+### (8) 懒加载
+- 主要就是使用 `import()` 函数，实现`动态加载模块(懒加载)`
+- import()
+  - 参数：文件路径
+  - 返回值：返回一个`promise` 对象
+  - 特点
+    - import()函数可以用在任何地方，不仅仅是模块，非模块的脚本也可以使用
+    - 它是运行时执行，也就是说，什么时候运行到这一句，就会加载指定的模块
+  - 使用场景
+    - 按需加载
+    - 条件加载
+    - 动态的模块路径
+```
+const button = document.createElement("button");
+button.innerHTML = "动态加载";
+button.style.border = "10px solid blue";
+button.style.margin = "10px";
+button.addEventListener("click", () => {
+  import("./test-import().js").then((res) =>
+    console.log(`动态获取，动态引入模块中的导出的值`, res.default.a)
+  );
+});
+document.documentElement.insertBefore(button, document.body);
+```
