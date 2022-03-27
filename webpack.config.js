@@ -24,6 +24,7 @@ module.exports = {
   // - cross-env -------------------------> 指定的是 node 环境中的环境变量
   // - webpack.DefinePlugin() ------------> 指定的是 浏览器 环境你中的环境变量
   // - mode ------------------------------> 指定的是 浏览器 环境中的环境变量，这里 ( mode: process.env.NODE_ENV ) 相当于 ( webpack.DefinePLugin({'process.env.NODE_ENV': JSON.stringify('xxxx')}) )
+  // - ( mode: 'development' ) 相当于 ( webpack.DefinePlugin({'process.env.NODE_ENV': JSON.stringify('development')}) )
 
   // entry
   //  1. entry 表示thunk的入口点
