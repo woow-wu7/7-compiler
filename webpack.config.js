@@ -12,7 +12,18 @@ module.exports = {
   //  1. mode: 表示模式
   //      - development 开发环境
   //      - production  生产环境
-  mode: "development",
+
+  mode: process.env.NODE_ENV,
+  // 注意：1. 这里是 ( webpack.config.js ) 文件，属于 ( node环境 )，而不是 ( 浏览器环境 )
+  // 注意：2. 这里的 ( process.env.NODE_ENV ) 是通过 ( package.json 中的 scripts 中的 cross-env 来指定的 )；
+  // 注意：3. mode 指定的是 ( 浏览器中的环境变量，只不过这里的mode的值process.env.NODE_ENV是通过cross-env来指定的 )
+  // 问题：-- 自然而然会想到一个问题？如何同步浏览器和node环境中的环境变量呢？
+  // 回答：-- 就是利用这里的方式 ( mode: process.env.NODE_ENV )，
+  // 原理：-- ( cross-env NODE_ENV=aaa ) => 那么这里的 ( process.env.NODE_ENV=aaa ) => 推出 ( mode=aaa ) => ( webpack.DefinePLugin({'process.env.NODE_ENV': JSON.stringify(aaa)}) ) => ( 在浏览器环境中的 process.env.NODE_ENV=aaa )
+  // 总结：
+  // - cross-env -------------------------> 指定的是 node 环境中的环境变量
+  // - webpack.DefinePlugin() ------------> 指定的是 浏览器 环境你中的环境变量
+  // - mode ------------------------------> 指定的是 浏览器 环境中的环境变量，这里 ( mode: process.env.NODE_ENV ) 相当于 ( webpack.DefinePLugin({'process.env.NODE_ENV': JSON.stringify('xxxx')}) )
 
   // entry
   //  1. entry 表示thunk的入口点
@@ -307,9 +318,37 @@ module.exports = {
       filename: "css/main.css", // 指定被打包后的文件夹，和文件名
       // filename: 'main.css', 抽离出来的css文件名
     }),
+
     new webpack.DefinePlugin({
       AUTH: JSON.stringify("AUTH_NAME"), // --- 需要使用 JSON.stringify()
     }),
+    // webpack.DefinePlugin 和 cross-env 和 mode 的区别？？？？？？？？？？？
+    // - cross-env
+    //   - 作用：设置的是 ( node的环境 ) 中的环境变量 process.env，也就是说只能在webpack.config.js中访问到
+    //   - 例子：`{ scripts: { "test:dev": "cross-env NODE_ENV=development OTHER_ENV=other webpack serve --config build/webpack.config.js" }}`
+    //   - 语法：cross-env可以设置多个node环境的环境变量，只需要空格隔开就行，如上
+    //   - 安装：npm install cross-env
+    // - webpack.DefinePlugin()
+    //   - 设置的是 ( 浏览器环境 ) 中的环境变量，也就是说可以在各个js文件中使用到 webpack.DefinePlugin() 中定义的环境变量
+    //   - 注意点：
+    //     - 如果环境变量的值是一个字符串，那么需要用 JSON.stringify('"string"') 进行转译，所以为了安全保证，将所有数据类型都进行JSON.stringify来处理
+    //     - 如果 webpack.DefinedPlugin({'process.env.NODE_ENV': xxxx})，那么在浏览器环境中也能访问到process.env.NODE_ENV，这就是webpack.config.js中的mode属性需要干的事情
+    // - mode
+    //   - mode的作用是，mode的值将会作为 webpack.DefinedPlugin({'process.env.NODE_ENV': JSON.stringify('mode的值')})
+    //   - development，production，none
+    // - 总结区别
+    //   - cross-env定义的环境变量，只能在node环境中被访问到，即 webpack.config.js 中被访问到
+    //   - webpack.DefinePlugin()定义的环境变量，只能在浏览器环境中被访问到，即只能在各个module模块中去使用，不能在webpack.config.js中使用
+    //   - mode指定的值，mode的值将会作为 webpack.DefinedPlugin({'process.env.NODE_ENV': JSON.stringify('mode的值')})，从而能在浏览器环境中访问，即module中访问
+    // - 实践案例1
+    //   - 结果：如果webpack.config.js中的 mode="development"，并且在 build命令时执行的命令 cross-env NODE_ENV="production"，随便在模块js中打印process.env.NODE_ENV输出的是'development'
+    //   - 原因：说明浏览器环境中的process.env.NODE_ENV是通过webpack.config.js 中的 mode属性 设置的，而webpack.config.js中的process.env.NODE_ENV是通过cross-env来设置的
+    //   - 本质：mode的作用是，mode的值将会作为 webpack.DefinedPlugin({'process.env.NODE_ENV': JSON.stringify('mode的值')})，从而能在浏览器环境中访问，即module中访问
+    //   - 所以：如何同步？可以将 mode 设置为 ( mode:process.env.NODE_ENV ) 这样 ( node 和 浏览器 中的环境变量就同步了 )，因为 ( cross-env将webpack.config.js中的环境变量设置为了对应的值，而mode=process.env.NODE_ENV，mode有设置了webpack.DefinePlugin()中的process.env.NODE_ENV，用于在浏览器环境中使用)
+    // - 实践案例2
+    //   - 设置不同的环境对应的后端服务器地址，详见examples/main.js
+    //   - 源码地址：https://github.com/woow-wu7/8-divine/blob/main/examples/main.js
+
     new webpack.BannerPlugin({ banner: " by woow_wu7" }), // webpack自带的plugin，用于在js文件开头注释一些说明内容
     new webpack.IgnorePlugin(/\.\/local/, /moment/), // 表示从moment中如果引入了 ./local 文件路径，则把 ./local  中的所有文件忽略掉
     new webpack.DllReferencePlugin({
