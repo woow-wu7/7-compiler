@@ -99,8 +99,8 @@ module.exports = {
   //      - filename: 表示打包后的 thunk 的名字
   //      - '[name].[hash:8].js'
   //        - []: 表示占位符
-  //        - [name]: 表示使用 entry 属性对象中的 key 作为thunk名
-  //        - [hash:8]: 表示加上hash串，长度为 8
+  //        - [name]: 表示使用 entry 属性对象中的 key 作为thunk名，此时 entry 是一个对象，通过key指定不同的入口文件名
+  //        - [hash:8]: 表示加上hash串，长度为 8，从而是文件变动后生成不同的hash来使缓存失效，一共有三种hash: hash chunkHash contentHash
   //  2. path
   //      - path: 表示打包生成的文件夹的路径
   //  3. hash chunkhash contenthash 之间的区别？
@@ -145,10 +145,10 @@ module.exports = {
   //      - 如果不希望传递 '/api' 需要用 pathRewrite 重写路径
   //  2. contentBase
   //      - contentBase: 表示服务器的内容来源
-  //      - contentBase需要和output.path保持一致
-  //  3. host主机 port端口 compress开启gzip压缩 hot开启热更新
+  //      - 注意: contentBase 需要和 output.path 保持一致
+  //  3. host主机  port端口  compress开启gzip压缩  hot开启热更新
   devServer: {
-    // 开发服务器配置项
+    // 本地开发服务器 - 配置项
     contentBase: path.join(__dirname, "build"),
     host: "localhost", // 主机，可以从外部访问
     port: 5555,
@@ -175,6 +175,7 @@ module.exports = {
   // devtool
   // - source-map
   // - eval-source-map
+  // https://webpack.js.org/configuration/devtool/#root
   devtool: "source-map", // 显示行数，产生map文件
   // devtool: 'eval-source-map', // 显示行数，不产生map文件
 
