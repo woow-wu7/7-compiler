@@ -1,6 +1,6 @@
 class EntryOptionPlugin {
-  apply(compiler) {
-    compiler.hooks.entryOption.tap("entryOption", function () {
+  apply(compiler) { // apply方法是 - 声明在 class 的 原型对象上的，通过 new 调用该类后，实例就能访问到原型对象上的方法
+    compiler.hooks.entryOption.tap("entryOption", function () { // tab注册
       console.log("EntryOptionPlugin");
     });
   }

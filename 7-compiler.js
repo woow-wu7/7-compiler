@@ -1,16 +1,16 @@
 const path = require("path");
 const fs = require("fs");
-const babelParser = require("@babel/parser"); // 解析
-const babelTraverse = require("@babel/traverse").default; // 遍历
-const babelTypes = require("@babel/types"); // 增删改查
-const babelGenerator = require("@babel/generator").default; // 生成
+const babelParser = require("@babel/parser"); // 解析 ----------------- 把 源码字符串 -> AST
+const babelTraverse = require("@babel/traverse").default; // 遍历 ----- 遍历 AST
+const babelTypes = require("@babel/types"); // 增删改查 ---------------- 增删改查
+const babelGenerator = require("@babel/generator").default; // 生成 --- 重新把操作过后的 AST -> 源码字符串
 const ejs = require("ejs");
 const { SyncHook } = require("tapable");
 
-// config 是webpack配置文件，返回的是一个对象，即 module.exports 返回的那个对象
+// config 是 webpack 的配置文件，返回的是一个对象，即 module.exports 返回的那个对象
 const config = require(path.resolve(__dirname, "webpack.config.7compiler.js"));
 
-class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts中，直接执行命令 "cnpm run 7-pack"
+class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts中，直接执行命令 "cnpm run 7-pack" ---- 在该文件最底部，调用了 Compiler 类
   constructor(config) {
     this.config = config;
     this.entryId = null; // 保存入口文件的路径 './scr/index.js'，即 ( webpack.config.js ) 中的 ( entry ) 入口文件的相对路径
@@ -29,16 +29,25 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
     let plugins = this.config.plugins // 获取webpack.config.js配置文件中的 plugins 数组，( webpack.config.js是默认名，可以手动在输入命令行时指定 )
     if (Array.isArray(plugins)) {
       plugins.forEach(plugin => {
-        plugin.apply(this)
-        // 1. this是compiler实例对象
-        // 2. 每个 webpack plugin 都必须具有一个 apply 方法，( apply(compiler)方法接受compiler实例对象作为参数 )
-        // 3. this.config.plugins 即是webpack.config.js中的plugins = [new HtmlWebpackPlugin(), ...] = [插件实例1, 插件实例2, ...] 
-        // 4. 通过插件实例就能调用原型链上的 apply 方法
+        plugin.apply(this) // ================================ tap注册: 执行插件的 apply 方法进行所有 生命周期 的 tap 注册
+        // 1. this 是compiler实例对象
+        // 2. 每个 webpack plugin 都必须具有一个 apply 方法，( apply(compiler) 方法接受 compiler 实例对象作为参数 )
+        // 3. this.config.plugins 即是 webpack.config.js 中的 plugins = [new HtmlWebpackPlugin(), ...] = [插件实例1, 插件实例2, ...]
+        // 4. 通过插件实例就能调用原型链上的 apply 方法，这里的 plugin 就是插件new生成的实例
       })
     }
-    this.hooks.afterPlugins.call() // ======================== afterPlugins
+    this.hooks.afterPlugins.call() // ======================== call调用: 调用 afterPlugins，执行tap注册时指定的回调函数
     // 钩子函数的调用call(): 在执行完所有 plugin 时，触发对应的钩子函数 afterPlugins
     // 钩子函数的注册tap(): 在 plugin 的 apply 方法中通过tap方法注册，而tap方法被调用是在constructor中被调用，因为constructor会最新被执行，即最先完成监听钩子的注册
+
+    // 比如: entryOptionPlugin 插件的定义如下
+    // class EntryOptionPlugin {
+    //   apply(compiler) { // apply方法是 - 声明在 class 的 原型对象上的，通过 new 调用该类后，实例就能访问到原型对象上的方法
+    //     compiler.hooks.entryOption.tap("entryOption", function () { // tab注册
+    //       console.log("EntryOptionPlugin");
+    //     });
+    //   }
+    // }
   }
 
 
@@ -60,7 +69,7 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
       // 遍历 rules 数组，成员是对象，具有 test use 属性
       // config.module.rules.test  config.module.rules.use
       const { test, use } = rules[i];
-      let backLoaderIndex = use.length - 1;
+      let backLoaderIndex = use.length - 1; // 注意: loader的use数组，是从后往前遍历的，因为loader的加载顺序是 ( 从右往左 从下往上 )
       if (test.test(moduleAbsolutePath)) {
         // module -> rules -> { test, use } 匹配每个模块的绝对路径的话，需要用对应的loader来转化
         // ( 模块的绝对路径 ) 和 ( module.rules.test ) 是否匹配
@@ -75,18 +84,18 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
       }
     }
 
-    return contentString;
+    return contentString; // 返回经过 loader 处理过后的模块的源码字符串
   };
 
 
   // parse()
   // -------------------------------------------------------------------------------parse
   // 参数：(1)source: 源码字符串 (2)parentPath: 父路径
-  // 返回值: (1)解析过后的源码字符串 (2)依赖数组列表
+  // 返回值: (1)解析过后的源码字符串 (2)该模块所依赖的-依赖数组列表
   // (二) 解析
   parse = (source, parentPath) => {
     // ( 源码string ) => ( AST ) => ( 遍历AST ) => ( 转换AST ) => ( 获取新的源码字符串 )
-    // 1. @babel/parser -------------- 将源码string转成AST
+    // 1. @babel/parser ------------- 将源码string转成AST
     // 2. @babel/traverse ----------- 遍历AST，并在遍历过程中通过 @babel/types完成修改，添加，删除等操作
     // 3. @babel/types -------------- 修改，添加，删除AST的各个节点
     // 4. @babel/generator ---------- 将修改后的AST再转成源码字符串
@@ -153,8 +162,6 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
     // - sourceCode：经过 ( 源码string ) => ( AST ) => ( 遍历AST ) => ( 转换AST ) => ( 获取新的源码字符串 ) 后返回的 ( 源码字符串 )
     // - dependencies：( 该模块 ) 依赖的 ( 其他模块 ) 的相对路径，即import，require引入模块的相对路径
 
-    // console.log("1111", sourceCode, dependencies);
-
     this.modules[moduleRelativePath] = sourceCode;
     // this.modules
     // key：moduleRelativePath
@@ -197,7 +204,7 @@ class Compiler { // 通过 new Compiler(config) 调用，已经配置到scripts�
   // -------------------------------------------------------------------------------run
   run() {
     this.hooks.run.call() // ================================= run
-    const entryAbsolutePath = path.resolve(this.root, this.entry); // 入口文件绝对路径， F:\workSpace\7-compiler\src\index.js
+    const entryAbsolutePath = path.resolve(this.root, this.entry); // 入口文件绝对路径， F:\workSpace\7-compiler\src\index.js ------- root: node.js进程的当前工作路径
 
     this.hooks.compile.call() // ============================= compile
     this.buildModules(entryAbsolutePath, true); // 创建模块的依赖关系 ----------------one

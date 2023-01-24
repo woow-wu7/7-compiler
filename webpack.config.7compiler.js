@@ -28,6 +28,7 @@ module.exports = {
     ]
   },
   plugins: [
+    // 这里的插件是 - 生命周期相关的插件
     new EntryOptionPlugin(),
     new AfterPlugin(),
     new RunPlugin(),

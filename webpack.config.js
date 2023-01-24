@@ -57,6 +57,43 @@ module.exports = {
     other: "./src/other.js",
   },
 
+  // 扩展
+  // ### 打包多页应用
+  // - 1. entry 设置为 ( 对象模式 )，即可以指定 ( 多个入口 )
+  // - 2. output 的 ( filename ) 设置为 ( '[name].[hash:8].js' ) 的形式，这里使用到了 ( 占位符 ) 则可以分别打包为不同的 ( 出口文件 )
+  // - 3. plugin 数组中，需要多次 ( new HTMLWebpackPlugin() )
+  //    - a. 不同html引入不同js: 并且可以指定 ( chunks: ['home'] ) 来表示当前 html 引入哪些 js 文件，比如: 这里表示引入 home.js 文件，因为 output 中有多个 js 文件，不同的html不一定要引入所有的js
+  //    - b. 如果不设置 chunks 属性，那么每个html都会引入所有的 output 中的所有 chunk
+  // ```
+  // webpack.config.js
+  // ---
+  // 1
+  // entry: {
+  //   main: "./src/index.js", // 这里entry是一个对象，main 就是打包后的 thunk 名称
+  //   other: "./src/other.js",
+  // }
+  // 2
+  // output: {
+  //   filename: "[name].[hash:8].js",
+  //   path: path.resolve(__dirname, "build"),
+  // }
+  // 3
+  // plugins: [
+  //   new HtmlWebpackPlugin({
+  //     template: "./src/index.html",
+  //     filename: "index.html", // 打包过后的html的文件名
+  //     hash: true, // 在打包后的build文件夹中的html文件引入资源时，是否加hash串
+  //     chunks: ['home'] // 打包多页应用时，可以指定 chunks，--- 表示 index.html 只引用了 home.js 文件，而不是 home.js 和 other.js 都引入
+  //   }),
+  //   new HtmlWebpackPlugin({
+  //     template: "./src/index.html",
+  //     filename: "other.html",
+  //     hash: true,
+  //     chunks: ['other']
+  //   }),
+  // ]
+  // ```
+
   // output
   //  1. filename
   //      - filename: 表示打包后的 thunk 的名字
@@ -93,7 +130,6 @@ module.exports = {
   //          - contentHash(即使是相同chunk的js和css，改动js只会影响对应的js而不会影响到css)：每一个代码块（chunk）中的js和css输出文件都会独立生成一个hash，当某一个代码块（chunk）中的js源文件被修改时，只有该代码块（chunk）输出的js文件的hash会发生变化
   //  4. 在哪些地方可以使用到 hash chunkhash contenthash
   //      - 凡是在 webpack.config.js 中具有 ( filename ) 属性的地方都可以使用 ( 占位符的方式 [hash] ) 使用到这几种hash
-
   output: {
     filename: "[name].[hash:8].js",
     // filename: "[name].[chunkhash:8].js",
